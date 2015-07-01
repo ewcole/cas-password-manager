@@ -104,12 +104,14 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 	@Override
 	public void setUserPassword(String username, String password) {
 		logger.debug("We have " + ldapServers.size() + " LDAP servers to look at.");
+
+                boolean passwordChanged = false;
 		for(LdapServer ldapServer : ldapServers) {
 			logger.debug("Checking server " + ldapServer.getDescription() + " for user " + username);
 			try {
 				ldapServer.setPassword(username, password);
 				logger.debug("Successfully set password for " + username + " at " + ldapServer.getDescription());
-				return;
+				passwordChanged = true;
 			} catch(NameNotFoundException ex) {
 				logger.debug("Didn't find " + username + " in " + ldapServer.getDescription());
 				// ignore... we'll try another server
@@ -118,10 +120,11 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 				// ignore it... try the next server
 			}
 		}
-		
-		logger.debug("Couldn't find server for " + username);
-		throw new NameNotFoundException("Couldn't find username " 
-				+ username + " in any of provided servers.");		
+		if (!passwordChanged) {
+                    logger.debug("Couldn't find server for " + username);
+                    throw new NameNotFoundException("Couldn't find username " 
+				+ username + " in any of provided servers.");
+		}
 	}
 
 	@Override
