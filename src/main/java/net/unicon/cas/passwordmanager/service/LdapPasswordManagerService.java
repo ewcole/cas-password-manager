@@ -55,12 +55,18 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 	@Override
 	public void setUserSecurityChallenge(String username,
 			SecurityChallenge securityChallenge) {
-		
+                // Manually track whether we set the name or not.
+                boolean nameChanged = false;
 		for(LdapServer server : ldapServers) {
 			try {
+				logger.debug("Attempting to set user security challenge for " + username + " at " + server.getDescription());
 				server.setUserSecurityChallenge(username, securityChallenge);
 				logger.debug("Successfully set user security challenge for " + username + " at " + server.getDescription());
-				return;
+                                // - Ed Cole - 2015-06-29 - Don't quit after 
+                                //   changing the first security question; copy 
+                                //    it to all of the LDAP servers.
+				// return;
+                                nameChanged = true;
 			} catch(NameNotFoundException ex) {
 				logger.debug("Didn't find " + username + " in " + server.getDescription());
 				// ignore it... try the next server
@@ -69,9 +75,10 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 				// ignore it... try the next server
 			}
 		}
-		
-		throw new NameNotFoundException("Couldn't find username " 
+		if (!nameChanged) {
+                	throw new NameNotFoundException("Couldn't find username " 
 				+ username + " in any of provided servers.");
+                } 
 	}
 	
 	public SecurityChallenge getDefaultSecurityChallenge(String username) {
