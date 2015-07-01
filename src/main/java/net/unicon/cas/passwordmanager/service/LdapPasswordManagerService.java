@@ -27,10 +27,13 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 
 	@Override
 	public SecurityChallenge getUserSecurityChallenge(String username) {
-		
+                LdapServer lastServer = null;
 		for(LdapServer server : ldapServers) {
 			try {
+                            logger.debug("Looking for security challenge for " + username + " at " + server.getDescription());
 				SecurityChallenge challenge = server.getUserSecurityChallenge(username);
+				// Ed Cole 2015-06-30 - Only return the challenge if it is not null.
+                                //    There might be a valid one in another server.
 				if(logger.isDebugEnabled()) {
 					if(challenge != null) {
 						logger.debug("Successfully got security challenge for " + username + " at " + server.getDescription());
@@ -38,7 +41,10 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 						logger.debug("Got null security challenge for " + username + " at " + server.getDescription());
 					}
 				}
-				return challenge;
+                                if (challenge != null) {
+                                    return challenge;
+                                }
+                                lastServer = server;
 			} catch(NameNotFoundException ex) {
 				logger.debug("Didn't find " + username + " in " + server.getDescription());
 				// ignore it... try the next server
@@ -47,9 +53,11 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 				// ignore it... try the next server
 			}
 		}
-		
-		throw new NameNotFoundException("Couldn't find username " 
+		if (lastServer == null) {
+                    throw new NameNotFoundException("Couldn't find username " 
 				+ username + " in any of provided servers.");
+                }
+                return null;
 	}
 
 	@Override
