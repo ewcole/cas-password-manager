@@ -133,14 +133,33 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 		// throws UserLockedOutException if this isn't allowed
 		lockoutService.allowAttempt(username);
 		
-		for(LdapServer ldapServer : ldapServers) {
+                boolean oldPasswordIsValid = false;
+                for(LdapServer ldapServer : ldapServers) {
+                    logger.debug("Checking old password for " + username + " against " + ldapServer.getDescription());
+                    try {
+                        if(ldapServer.verifyPassword(username, oldPassword)) {
+                            oldPasswordIsValid = true;
+                            logger.debug("Authenticated against " + ldapServer.getDescription());
+                            lockoutService.clearIncorrectAttempts(username);
+                            break; // You've found what you want; don't keep looking.
+                        }
+                    } catch(AuthenticationException ex) {
+                        logger.debug("Didn't find " + username + " in " + ldapServer.getDescription());
+                        // ignore... we'll try another server
+                    } catch(NameNotFoundException ex) {
+                        logger.debug("Didn't find " + username + " in " + ldapServer.getDescription());
+                        // ignore... we'll try another server
+                    } catch(ObjectRetrievalException ex) {
+                        logger.debug("Multiple results found for " + username);
+                        // ignore it... try the next server
+                    }
+                }
+                if (oldPasswordIsValid) {
+                    // We found a server with a valid password match, so go ahead and change them all.
+                    for(LdapServer ldapServer : ldapServers) {
 			try {
-				if(ldapServer.verifyPassword(username, oldPassword)) {
-					ldapServer.setPassword(username, newPassword);
-					logger.debug("Successfully changed password for " + username + " at " + ldapServer.getDescription());
-					lockoutService.clearIncorrectAttempts(username);
-					return;
-				}
+				ldapServer.setPassword(username, newPassword);
+				logger.debug("Successfully changed password for " + username + " at " + ldapServer.getDescription());
 			} catch(AuthenticationException ex) {
 				logger.debug("Didn't find " + username + " in " + ldapServer.getDescription());
 				// ignore... we'll try another server
@@ -151,12 +170,13 @@ public class LdapPasswordManagerService implements PasswordManagerService {
 				logger.debug("Multiple results found for " + username);
 				// ignore it... try the next server
 			}
-		}
-		
-		lockoutService.registerIncorrectAttempt(username);
-		logger.debug("Couldn't find server for " + username + " or bad password.");
-		throw new NameNotFoundException("Couldn't find username " 
+                    }
+                } else {
+                    lockoutService.registerIncorrectAttempt(username);
+                    logger.debug("Couldn't find server for " + username + " or bad password.");
+                    throw new NameNotFoundException("Couldn't find username " 
 				+ username + " in any of provided servers or bad password.");	
+                }
 	}
 
 	public void setLdapServers(List<LdapServer> ldapServers) {
