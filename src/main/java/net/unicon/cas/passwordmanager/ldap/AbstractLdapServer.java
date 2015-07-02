@@ -103,8 +103,9 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 			String securityResponseAttr = securityResponseAttrs.get(i);
 			SecurityQuestion securityQuestion = securityQuestions.get(i);
 			
-			Attribute question = new BasicAttribute(securityQuestionAttr, securityQuestion.getQuestionText());
-			Attribute response = new BasicAttribute(securityResponseAttr, securityQuestion.getResponseText());
+                        // Encrypt the question and response before saving them.
+			Attribute question = new BasicAttribute(securityQuestionAttr, securityQuestion.getEncryptedQuestionText());
+			Attribute response = new BasicAttribute(securityResponseAttr, securityQuestion.getEncryptedResponseText());
 			
 			ModificationItem questionItem = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, question);
 			ModificationItem responseItem = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, response);
@@ -232,8 +233,11 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 				String securityQuestionText = (String) securityQuestionAttr.get();
 				String securityResponseText = (String) securityResponseAttr.get();
 				
-				SecurityQuestion securityQuestion = new SecurityQuestion(securityQuestionText,
-						securityResponseText);
+                                // Create the security question and assign the values from the 
+                                // encrypted question and response from the server.
+				SecurityQuestion securityQuestion = new SecurityQuestion();
+                                securityQuestion.setEncryptedQuestionText(securityQuestionText);
+                                securityQuestion.setEncryptedResponseText(securityResponseText);
 				
 				securityQuestions.add(securityQuestion);
 			}
@@ -275,8 +279,10 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 				
 				String securityResponseText = (String) securityResponseAttr.get();
 				
-				SecurityQuestion securityQuestion = new SecurityQuestion(securityQuestionText,
-						securityResponseText);
+				// Create a security question using the encrypted values from the server.
+                                SecurityQuestion securityQuestion = new SecurityQuestion();
+                                securityQuestion.setEncryptedQuestionText(securityQuestionText);
+                                securityQuestion.setEncryptedResponseText(securityResponseText);
 				
 				securityQuestions.add(securityQuestion);
 			}

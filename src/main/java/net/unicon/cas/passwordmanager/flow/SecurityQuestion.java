@@ -54,6 +54,36 @@ public class SecurityQuestion implements Serializable {
 		this.responseText = responseText;
 	}
     
+    /** Return an encrypted form of the question text for storage */
+    public String getEncryptedQuestionText() {
+        // The default version treats it as clear text.
+        return questionText;
+    }
+
+    /** Decrypt the encryptedQuestionText and set questionText to that value.
+     *  @param encryptedQuestionText The value which, when decrypted, yeilds
+     *                               the user's question text.
+     */
+    public void setEncryptedQuestionText(String encryptedQuestionText) {
+        // The default version treats it as clear text.
+        this.questionText = encryptedQuestionText;
+    }
+
+    /** Return an encrypted form of the response text for storage */
+    public String getEncryptedResponseText() {
+        // The default version treats it as clear text.
+        return responseText;
+    }
+
+    /** Decrypt the encryptedResponseText and set responseText to that value.
+     *  @param encryptedResponseText The value which, when decrypted, yeilds
+     *                               the user's response text.
+     */
+    public void setEncryptedResponseText(String encryptedResponseText) {
+        // The default version treats it as clear text.
+        this.responseText = encryptedResponseText;
+    }
+
     public boolean validateResponse(String responseText) {
     	if(responseText.matches(DATE_REGEX) && this.responseText.matches(DATE_REGEX)) {
     		// validate them as dates
