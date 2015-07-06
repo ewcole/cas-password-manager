@@ -9,7 +9,7 @@ import java.util.Date;
  * <p>Bean for holding a user security question and answer. Includes a
  * method for validating responses.</p>
  */
-public class SecurityQuestion implements Serializable {
+public abstract class SecurityQuestion implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final String DATE_REGEX = "^(0?[1-9]|1[012])/(0?[1-9]|[12][0-9]|3[01])/(19|20)\\d\\d$";
