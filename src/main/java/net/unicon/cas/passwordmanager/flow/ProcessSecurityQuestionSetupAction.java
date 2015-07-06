@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import net.unicon.cas.passwordmanager.service.PasswordManagerService;
 import net.unicon.cas.passwordmanager.flow.model.SecurityQuestionBean;
 import org.springframework.binding.message.MessageContext;
+import edu.sunyjcc.cas.passwordmanager.flow.SecurityQuestionFactory;
 
 /**
  * <p>Sets up the user's security questions.</p>
@@ -13,6 +14,7 @@ import org.springframework.binding.message.MessageContext;
 public class ProcessSecurityQuestionSetupAction {
 	
 	private PasswordManagerService passwordManagerService; 
+	private SecurityQuestionFactory securityQuestionFactory;
 
     public boolean setSecurityQuestion(String username, SecurityQuestionBean securityQuestion,
     		MessageContext context) throws Exception {
@@ -22,7 +24,7 @@ public class ProcessSecurityQuestionSetupAction {
     	}
     	
     	List<SecurityQuestion> securityQuestions = new ArrayList<SecurityQuestion>();
-    	securityQuestions.add(new SecurityQuestion(securityQuestion.getQuestionText(),securityQuestion.getResponseText()));
+    	securityQuestions.add(securityQuestionFactory.createFromPlainText(securityQuestion.getQuestionText(),securityQuestion.getResponseText()));
     	SecurityChallenge securityChallenge = new SecurityChallenge(username,securityQuestions);
 
     	passwordManagerService.setUserSecurityChallenge(username, securityChallenge);
@@ -34,4 +36,13 @@ public class ProcessSecurityQuestionSetupAction {
 			PasswordManagerService passwordManagerService) {
 		this.passwordManagerService = passwordManagerService;
 	}
+
+    public SecurityQuestionFactory getSecurityQuestionFactory() {
+        return this.securityQuestionFactory;
+    }
+
+    public void setSecurityQuestionFactory(SecurityQuestionFactory securityQuestionFactory) {
+        this.securityQuestionFactory = securityQuestionFactory;
+    }
+
 }

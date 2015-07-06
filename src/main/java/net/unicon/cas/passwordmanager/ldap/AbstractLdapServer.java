@@ -37,6 +37,8 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.ldap.filter.Filter;
 
+import edu.sunyjcc.cas.passwordmanager.flow.SecurityQuestionFactory;
+
 public abstract class AbstractLdapServer implements LdapServer, InitializingBean {
 
 	private final Log logger = LogFactory.getLog(this.getClass());
@@ -51,7 +53,7 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 	protected String description;
 	protected String searchBase;
 	protected boolean ignorePartialResultException = false;
-	
+	protected SecurityQuestionFactory securityQuestionFactory;
 
     /** The default maximum number of results to return. */
     private static final int DEFAULT_MAX_NUMBER_OF_RESULTS = 1000;
@@ -104,9 +106,11 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 			SecurityQuestion securityQuestion = securityQuestions.get(i);
 			
                         // Encrypt the question and response before saving them.
+                        logger.debug("Encrypt the question and response before saving them.");
 			Attribute question = new BasicAttribute(securityQuestionAttr, securityQuestion.getEncryptedQuestionText());
 			Attribute response = new BasicAttribute(securityResponseAttr, securityQuestion.getEncryptedResponseText());
-			
+
+                        logger.debug("Create ModificationItem for question and response.");
 			ModificationItem questionItem = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, question);
 			ModificationItem responseItem = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, response);
 			
@@ -235,7 +239,7 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 				
                                 // Create the security question and assign the values from the 
                                 // encrypted question and response from the server.
-				SecurityQuestion securityQuestion = new SecurityQuestion();
+				SecurityQuestion securityQuestion = securityQuestionFactory.newSecurityQuestion();
                                 securityQuestion.setEncryptedQuestionText(securityQuestionText);
                                 securityQuestion.setEncryptedResponseText(securityResponseText);
 				
@@ -280,7 +284,7 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 				String securityResponseText = (String) securityResponseAttr.get();
 				
 				// Create a security question using the encrypted values from the server.
-                                SecurityQuestion securityQuestion = new SecurityQuestion();
+                                SecurityQuestion securityQuestion = securityQuestionFactory.newSecurityQuestion();
                                 securityQuestion.setEncryptedQuestionText(securityQuestionText);
                                 securityQuestion.setEncryptedResponseText(securityResponseText);
 				
@@ -462,4 +466,13 @@ public abstract class AbstractLdapServer implements LdapServer, InitializingBean
 		ldapTemplate = new LdapTemplate(ldapContextSource);
 		ldapTemplate.setIgnorePartialResultException(ignorePartialResultException);
 	}
+
+    public SecurityQuestionFactory getSecurityQuestionFactory() {
+        return this.securityQuestionFactory;
+    }
+
+    public void setSecurityQuestionFactory(SecurityQuestionFactory securityQuestionFactory) {
+        this.securityQuestionFactory = securityQuestionFactory;
+    }
+
 }
