@@ -8,15 +8,18 @@ import net.unicon.cas.passwordmanager.service.ChangePasswordResult.Result;
 import net.unicon.cas.passwordmanager.flow.SecurityChallenge;
 import net.unicon.cas.passwordmanager.flow.SecurityQuestion;
 
+import edu.sunyjcc.cas.passwordmanager.flow.SecurityQuestionFactory;
+
 public class TestPasswordManagerService implements PasswordManagerService {
 
 	private final Random random = new Random();
+	private SecurityQuestionFactory securityQuestionFactory;       
 
 	@Override
 	public SecurityChallenge getUserSecurityChallenge(String username) {
 		
-		SecurityQuestion q1 = new SecurityQuestion("Why?","Because");
-		SecurityQuestion q2 = new SecurityQuestion("How old are you?","Too old");
+		SecurityQuestion q1 = securityQuestionFactory.createFromPlainText("Why?","Because");
+		SecurityQuestion q2 = securityQuestionFactory.createFromPlainText("How old are you?","Too old");
 		
 		List<SecurityQuestion> securityQuestions = new ArrayList<SecurityQuestion>();
 		
@@ -31,8 +34,8 @@ public class TestPasswordManagerService implements PasswordManagerService {
 	@Override
 	public SecurityChallenge getDefaultSecurityChallenge(String username) {
 		
-		SecurityQuestion q1 = new SecurityQuestion("When is your birthday? (mm/yy/dddd)","5/20/1980");
-		SecurityQuestion q2 = new SecurityQuestion("What is your student/employee ID number?","12345");
+		SecurityQuestion q1 = securityQuestionFactory.createFromPlainText("When is your birthday? (mm/yy/dddd)","5/20/1980");
+		SecurityQuestion q2 = securityQuestionFactory.createFromPlainText("What is your student/employee ID number?","12345");
 		
 		List<SecurityQuestion> securityQuestions = new ArrayList<SecurityQuestion>();
 		
