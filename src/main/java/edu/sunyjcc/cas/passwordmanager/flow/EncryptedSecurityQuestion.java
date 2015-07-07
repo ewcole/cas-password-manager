@@ -7,6 +7,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import java.util.regex.*;
+import org.apache.commons.codec.binary.Base64;
+import java.io.UnsupportedEncodingException;
+import org.apache.commons.codec.EncoderException;
 /**
  * <p>Bean for holding a user security question and answer.  It includes
  *    code to encrypt and decript security challenges.</p>
@@ -14,7 +18,33 @@ import java.util.Date;
 public class EncryptedSecurityQuestion extends SecurityQuestion {
 
     private static final long serialVersionUID = 1L;
-    
+
+    /** Apache Commons base 64 encoder with no line breaks.*/
+    public static final Base64 base64 = new Base64(0);
+    public static final String encryptedStringRe = "^\\{(.*?)\\}(.*)$";
+    private static final Pattern encryptedStringPattern = 
+        Pattern.compile(encryptedStringRe);
+
+    private String encrypt(String text) {
+        return "{}" + base64.encodeBase64String(text.getBytes());
+    }
+
+    private String  decrypt(String text) {
+        Matcher matcher = encryptedStringPattern.matcher(text);
+        if (matcher.find()){
+            String algorithm = matcher.group(1);
+            String encText = matcher.group(2);
+            try {
+                byte[] bytes = base64.decodeBase64(encText);
+                return new String(bytes, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return encText;
+            }
+        } else {
+            return text;
+        }
+    }
+
     /** No-argument constructor */
     public EncryptedSecurityQuestion() { }
     
@@ -29,7 +59,7 @@ public class EncryptedSecurityQuestion extends SecurityQuestion {
     @Override
     public String getEncryptedQuestionText() {
         // The default version treats it as clear text.
-        return this.getQuestionText();
+        return encrypt(this.getQuestionText());
     }
 
     /** Decrypt the encryptedQuestionText and set questionText to that value.
@@ -39,14 +69,15 @@ public class EncryptedSecurityQuestion extends SecurityQuestion {
     @Override
     public void setEncryptedQuestionText(String encryptedQuestionText) {
         // The default version treats it as clear text.
-        this.setQuestionText(encryptedQuestionText);
+        String clearText = decrypt(encryptedQuestionText);
+        this.setQuestionText(clearText);
     }
 
     /** Return an encrypted form of the response text for storage */
     @Override
     public String getEncryptedResponseText() {
         // The default version treats it as clear text.
-        return this.getResponseText();
+        return encrypt(this.getResponseText());
     }
 
     /** Decrypt the encryptedResponseText and set responseText to that value.
@@ -55,8 +86,8 @@ public class EncryptedSecurityQuestion extends SecurityQuestion {
      */
     @Override
     public void setEncryptedResponseText(String encryptedResponseText) {
-        // The default version treats it as clear text.
-        this.setResponseText(encryptedResponseText);
+        String clearText = decrypt(encryptedResponseText);
+        this.setResponseText(clearText);
     }
 
 }
