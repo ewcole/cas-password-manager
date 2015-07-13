@@ -121,7 +121,7 @@
 -->
 	    	       
 	<bean id="passwordPolicyAction" class="org.jasig.cas.web.flow.PasswordPolicyEnforcementAction">
-	  	<property name="passwordPolicyEnforcer" ref="ldapPasswordPolicyEnforcer" />
+	  	<property name="passwordPolicyEnforcer" ref="listPasswordPolicyEnforcer" />
 	  	<property name="passwordPolicyUrl" value="${ldap.authentication.lppe.password.url}" />
 	</bean>
 
@@ -129,7 +129,8 @@
 		This bean defines the current implementation of the password policy enforcer for ldap.
 		The properties defined below would possibly exist inside the local 'cas.properties' file
 	-->
-	<bean id="ldapPasswordPolicyEnforcer" class="org.jasig.cas.adaptors.ldap.LdapPasswordPolicyEnforcer">
+	<bean id="ldapPasswordPolicyEnforcer" class="org.jasig.cas.adaptors.ldap.LdapPasswordPolicyEnforcer"
+              abstract="true">
 	  <property name="searchBase" value="${ldap.authentication.basedn}" />
 	  <property name="contextSource" ref="contextSource" />
 	  <property name="filter" value="${ldap.authentication.filter}" />
