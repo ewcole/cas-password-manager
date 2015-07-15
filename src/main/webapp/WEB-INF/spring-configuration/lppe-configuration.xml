@@ -120,7 +120,8 @@
 		p:contextSource-ref="contextSource" />
 -->
 	    	       
-	<bean id="passwordPolicyAction" class="org.jasig.cas.web.flow.PasswordPolicyEnforcementAction">
+	<bean id="passwordPolicyAction" 
+              class="edu.sunyjcc.cas.web.flow.PasswordPolicyEnforcementWithExpirationCheckAction">
 	  	<property name="passwordPolicyEnforcer" ref="listPasswordPolicyEnforcer" />
 	  	<property name="passwordPolicyUrl" value="${ldap.authentication.lppe.password.url}" />
 	</bean>
