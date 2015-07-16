@@ -1,6 +1,25 @@
 # CAS Password Manager
 
-## NOTICE
+This project is a fork of Unicon's CAS password manager on (https://github.com/Unicon/cas-password-manager)[GitHub].  
+
+* Ed Cole <edcole@mail.sunyjcc.edu>
+
+## Branches
+
+### master
+This is the master branch from the parent project.
+
+### master-ewcole
+This is the local master branch, containing all of the modifications made in this repository.
+
+### synchronize-passwords-and-questions
+This branch contains the changes needed to make the password synchronization work according to our specification.  We wanted the system to behave as if there were really only one password, and that security questions and passwords would be made the same across all servers.
+
+### encryptSecurityQuestions
+These modifications allow for storing the security questions in a garbled format, rather than clear text.  
+
+## README from Original Project
+### NOTICE
 **THIS PROJECT IS NOT CURRENTLY MAINTAINED. It is built against old CAS version (3.5.0) and most probably will require a significant amount of effort to modernize and bring it up to date with the current versions of CAS**
 
 * Drew Mazurek <dmazurek@unicon.net>
@@ -8,8 +27,7 @@
 * Unicon, Inc.
 
 
-Background
-----------
+### Background
 This project is an extension of the CAS LPPE work which has been integrated
 into CAS 3.5. The original password manager work was performed for Onondaga 
 Community College (http://www.sunyocc.edu), who graciously allowed us to 
@@ -17,8 +35,7 @@ make this product available to the public. The CAS 3.5 upgrade was sponsored
 by the University of Kansas (http://ku.edu) and by the Unicon CAS 
 Cooperative Support program (http://www.unicon.net/support/cooperative).
 
-Features
---------
+### Features
 The CAS PM extension provides basic password management tasks to users with
 minimal disruption to their browsing process. If their password has expired,
 they're asked to change it during the login flow and then they're sent
@@ -49,8 +66,7 @@ situations:
   * account must change password on login (handled by password manager)
   * account password will expire soon (handled by password manager)
 
-Build & Installation
---------------------
+### Build & Installation
 
 Prerequisites
 -------------
@@ -78,8 +94,7 @@ $ mvn install:install-file -Dfile=recaptcha4j-0.0.8.jar \
 
 You will also need to set up an account at http://www.google.com/recaptcha.
 
-Configuration
--------------
+### Configuration
 
 After you have obtained the prerequisites and checked out the source code,
 there are a few files you will need to configure.
@@ -118,8 +133,7 @@ there are a few files you will need to configure.
   need to edit a JSP file that isn't here, you can download the CAS Server
   3.5 distribution and copy the file from there into this directory.
 
-Building
---------
+### Building
 
 To build the CAS server, run the following from the root of the project:
 
@@ -128,8 +142,7 @@ To build the CAS server, run the following from the root of the project:
 If the build was successful, the CAS webapp can be found under `target/cas.war`.
 See the Jasig CAS documentation if you run into any issues building CAS.
 
-Troubleshooting
----------------
+### Troubleshooting
 
 Hopefully if you follow these instructions everything should work out fine.
 If not, however, the first step is to check your cas.log. If there are no 
@@ -143,8 +156,7 @@ yet. :) If you do run into an issue, try emailing the CAS community discussion
 list. You can subscribe by visiting http://www.jasig.org/cas/mailing-lists. I'm
 on the list, so maybe I can help out!
 
-To-Dos
-------
+### To-Dos
 
 There's no guaranteed timeline for any of the following, but the following
 are possible future improvements this project could use:
