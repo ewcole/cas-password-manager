@@ -72,6 +72,9 @@
 		<transition on="showWarning" to="passwordServiceCheck" />
 		<transition on="success" to="sendTicketGrantingTicket" />
 		<transition on="error" to="viewLoginForm" />
+                <transition on="mustChangePassword" to="passwordManager">
+                  <set name="flashScope.pmTask" value="'forceChangePassword'"/>
+                </transition>
 	</action-state>
 
 	<action-state id="passwordServiceCheck">
